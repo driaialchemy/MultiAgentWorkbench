@@ -55,3 +55,15 @@ pytest
 ```
 
 Always run the verification command before claiming a task is complete.
+
+## Audit Remediation Notes
+
+- Audit path: $AuditFile
+- Risk level from audit: $risk.
+- Addressed audit issues: Risk level is MEDIUM, expected LOW.; Dependency manifests present: requirements.txt; Test suite present — actively developed project.; Large file count (619 files) — broad agent scope increases risk of unintended changes.
+
+
+## Restricted Agent Scope
+
+Large repository scope detected (619 files). Agents should restrict work to the specific subdirectories named by the user's task and avoid broad formatting, cleanup, or exploratory rewrites across storage/generated artifacts.
+

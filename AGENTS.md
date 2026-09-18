@@ -46,3 +46,14 @@ If you find a committed `.env`, private key, or live credential: **stop**, repor
 ```bash
 pytest
 ```
+
+# Audit remediation metadata
+audit_path: audit/multi_repo/2026-09-18/repo_agentstack_20260918T004835Z.json
+risk_level: MEDIUM
+human_review_required: false
+audit_findings:
+  - "Risk level is MEDIUM, expected LOW."
+  - "Dependency manifests present: requirements.txt"
+  - "Test suite present — actively developed project."
+  - "Large file count (619 files) — broad agent scope increases risk of unintended changes."
+
