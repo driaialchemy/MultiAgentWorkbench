@@ -1,0 +1,2 @@
+- P1/P2: audit and evidence reports now include optional reasoning_path, policy_matched, and confidence; TRUST.md maps existing controls to cited modules.
+- policy_matched writes now emit the policy_decision id string per the canonical lineage schema.

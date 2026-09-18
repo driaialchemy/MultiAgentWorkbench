@@ -112,6 +112,28 @@ def build_audit_record(
     if evidence_ref:
         event["evidence_ref"] = evidence_ref
 
+    # Lineage shape: governance-logger/docs/decision-lineage-schema.md
+    reasoning_path = extra.pop("reasoning_path", None)
+    policy_matched = extra.pop("policy_matched", None)
+    confidence = extra.pop("confidence", None)
+    if reasoning_path is None:
+        derived: list[str] = []
+        if policy_decision:
+            derived.append(f"policy:{policy_decision}")
+        if pre_gate_status is not None:
+            derived.append(f"pre_gate:{pre_gate_status}")
+        if post_gate_status is not None:
+            derived.append(f"post_gate:{post_gate_status}")
+        if action:
+            derived.append(f"action:{action}")
+        reasoning_path = derived or None
+    if policy_matched is None and policy_decision:
+        policy_matched = policy_decision
+
+    event["reasoning_path"] = reasoning_path
+    event["policy_matched"] = policy_matched
+    event["confidence"] = confidence
+
     event.update(extra)
     return event
 

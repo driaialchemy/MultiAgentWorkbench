@@ -27,6 +27,8 @@ Demonstrate a single integrated stack where agents, skills, policy, gates, audit
 
 Stabilization pass: consistent blocked-state envelopes, audit field normalization, demo UI clarity, regression tests in `tests/test_stabilization_hardening.py`.
 
+Housekeeping (2026-07-06): removed superseded pre-charter planning drafts and ~475 stale demo-run artifacts (old checkpoints, session/working memory dumps, evidence exports, charts, reports, audit log) from git tracking. `storage/` and `reports/` subfolders are now gitignored except for `.gitkeep` placeholders — they repopulate automatically the next time you run a workflow. All 85 tests still pass after cleanup.
+
 ## Install
 
 ```powershell
@@ -59,6 +61,8 @@ python -m pytest tests/ -v
 - **Audit logger:** JSONL at `storage/audit_log.jsonl` with normalized fields where applicable.
 - **Memory/recovery:** validate-before-write, checkpoints, quarantine, dead-letter.
 - **Evidence:** policy/skill/audit summaries and governance verdict exported to `storage/evidence/`.
+
+`storage/*` and `reports/*` are runtime output (gitignored beyond `.gitkeep`) — they fill up again as soon as you run a workflow, so an empty checkout is expected.
 
 ## Demo workflow (happy path)
 

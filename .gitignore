@@ -18,3 +18,20 @@ env/
 # OS cruft
 Thumbs.db
 .DS_Store
+
+# Runtime / demo-run artifacts — regenerated on every run, not part of the app
+storage/checkpoints/*
+storage/memory/session/*
+storage/memory/working/*
+storage/evidence/*
+storage/charts/*
+storage/audit_log.jsonl
+storage/quarantine/*.jsonl
+reports/*
+!storage/checkpoints/.gitkeep
+!storage/memory/session/.gitkeep
+!storage/memory/working/.gitkeep
+!storage/evidence/.gitkeep
+!storage/charts/.gitkeep
+!storage/quarantine/.gitkeep
+!reports/.gitkeep

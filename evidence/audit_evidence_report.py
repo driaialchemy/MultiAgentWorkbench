@@ -26,6 +26,17 @@ def build_audit_evidence_report(
     quarantine = run_context.get("quarantine_events", [])
     dead_letter = run_context.get("dead_letter_events", [])
 
+    decision_lineage = [
+        {
+            "action": event.get("action"),
+            "status": event.get("status"),
+            "reasoning_path": event.get("reasoning_path"),
+            "policy_matched": event.get("policy_matched"),
+            "confidence": event.get("confidence"),
+        }
+        for event in run_events
+    ]
+
     return {
         "run_id": run_id,
         "event_count": len(run_events),
@@ -35,4 +46,5 @@ def build_audit_evidence_report(
         "checkpoints": checkpoints,
         "quarantine_events": quarantine,
         "dead_letter_events": dead_letter,
+        "decision_lineage": decision_lineage,
     }

@@ -12,11 +12,11 @@
 ## Latest test result
 
 ```text
-81 passed in ~40s
+85 passed in ~43s
 python -m pytest tests/ -q
 ```
 
-(Verified 2026-07-03)
+(Verified 2026-07-06, after removing stale demo artifacts and superseded planning drafts — see README housekeeping note)
 
 ## Recently created / modified (high signal only)
 

@@ -3,10 +3,30 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
 import streamlit as st
+
+# AWS-9: the AWS migration workspace (sibling directory, see
+# AGENTSTACK_AWS_WORKSPACE override) hosts the backend adapter that lets this
+# UI call either the local workflow or the deployed AWS API, without this
+# repo depending on that workspace's other code.
+_AWS_WORKSPACE = Path(
+    os.environ.get("AGENTSTACK_AWS_WORKSPACE")
+    or (Path(__file__).resolve().parent.parent / "aws")
+)
+if str(_AWS_WORKSPACE) not in sys.path:
+    sys.path.insert(0, str(_AWS_WORKSPACE))
+
+from adapters.streamlit_backend import (  # noqa: E402
+    BackendCallError,
+    BackendConfigError,
+    load_backend_config,
+    run_workflow as backend_run_workflow,
+)
 
 from agents.agent_registry import get_all_agents, get_enabled_agents
 from governance.audit_logger import generate_run_id, read_audit_events
@@ -45,6 +65,16 @@ st.set_page_config(
 st.title("agentstack")
 st.caption("Phases 1–6 complete — governed multi-agent demo stack")
 st.info(f"**Governance rule:** {CHARTER_RULE}")
+
+try:
+    BACKEND_CONFIG = load_backend_config()
+    if BACKEND_CONFIG.is_aws:
+        st.success(f"**Backend mode:** AWS — `{BACKEND_CONFIG.api_base_url}`")
+    else:
+        st.info("**Backend mode:** LOCAL (in-process workflow)")
+except BackendConfigError as exc:
+    st.error(f"**Backend mode:** misconfigured — {exc}")
+    BACKEND_CONFIG = None
 
 DEMO_SECTIONS = [
     "Workflow Charter",
@@ -367,6 +397,10 @@ with tab_run:
         st.warning(charter_status_message(charter_is_complete, charter_missing))
 
     if st.button("Run workflow", type="primary"):
+        if BACKEND_CONFIG is None:
+            st.error("Backend is not configured. Fix BACKEND_MODE / AWS_API_BASE_URL above before running a workflow.")
+            st.stop()
+
         form_data = _charter_form_data()
         is_complete, missing = validate_charter(form_data)
 
@@ -379,15 +413,29 @@ with tab_run:
             st.error(charter_status_message(False, ["Accountability owner named"]))
             st.stop()
 
-        with st.spinner("Running governed agent workflow..."):
-            result = _run_orchestrated_workflow(
+        def _local_run(*, workflow_type: str, data_source: str, charter_payload: dict[str, Any]) -> dict[str, Any]:
+            return _run_orchestrated_workflow(
                 workflow_type=workflow_type,
                 data_source=data_source,
-                charter_complete=is_complete,
+                charter_complete=True,
                 accountability_owner=owner,
             )
 
-        st.session_state.last_run_id = result["run_id"]
+        with st.spinner("Running governed agent workflow..."):
+            try:
+                result = backend_run_workflow(
+                    workflow_type=workflow_type,
+                    data_source=data_source,
+                    charter_payload=form_data,
+                    config=BACKEND_CONFIG,
+                    local_validate=validate_charter,
+                    local_run=_local_run,
+                )
+            except BackendCallError as exc:
+                st.error(f"AWS backend call failed: {exc}")
+                st.stop()
+
+        st.session_state.last_run_id = result.get("run_id")
         st.session_state.last_result = result
         st.session_state.last_orchestration = result
         analysis_step = next(
