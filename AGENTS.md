@@ -57,3 +57,11 @@ audit_findings:
   - "Test suite present — actively developed project."
   - "Large file count (619 files) — broad agent scope increases risk of unintended changes."
 
+## Approval gates
+
+Human approval is required before dependency changes, external-call changes, deploy or container config, secrets, and AI-provider or database config.
+
+## Setup
+
+pip install -r requirements.txt
+

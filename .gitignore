@@ -35,3 +35,10 @@ reports/*
 !storage/charts/.gitkeep
 !storage/quarantine/.gitkeep
 !reports/.gitkeep
+
+# governance baseline ignores
+!.env.example
+node_modules/
+*.log
+audit_temp/
+generated/
